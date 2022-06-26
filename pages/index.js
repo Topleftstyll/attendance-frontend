@@ -1,18 +1,21 @@
 import { useAuthContext } from "../context/AuthContext"
 import axios from 'axios'
+import { useRouter } from 'next/router'
+import { useEffect } from "react"
+import { Sidebar } from "../components"
 
 export default function Home() {
+  const router = useRouter()
   const {
     isLoggedIn,
-    login,
-    logout,
-    authToken
+    authToken,
   } = useAuthContext()
-
-  const handleLogin = () => {
-    if(isLoggedIn) return logout()
-    return login("test@test.com", "Password123")
-  }
+  
+  useEffect(() => {
+    if(!isLoggedIn) {
+      router.push('/login')
+    }
+  }, [])
 
   const fetchChildren = () => {
     axios.get('http://localhost:3035/api/v1/children', { 
@@ -29,27 +32,14 @@ export default function Home() {
 
   return (
     <div>
-      <h1 className="text-3xl font-bold underline">
-        Hello world!
-      </h1>
-      <h3>{isLoggedIn ? "YOU ARE LOGGED IN" : "PLEASE LOG IN"}</h3>
+      <h3>YOU ARE LOGGED IN</h3>
       <button
         type="button"
         className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-        onClick={handleLogin}
+        onClick={fetchChildren}
       >
-        {isLoggedIn ? "Logout" : "Login"}
+        Fetch Children
       </button>
-
-      {isLoggedIn &&
-        <button
-          type="button"
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-          onClick={fetchChildren}
-        >
-          Fetch Children
-        </button>
-      }
     </div>
   )
 }

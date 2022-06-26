@@ -1,22 +1,24 @@
 import React from 'react'
 import Head from 'next/head'
-import { Navbar, Footer } from './'
+import { Footer, Sidebar } from './'
+import { useAuthContext } from '../context/AuthContext'
 
 const Layout = ({ children }) => {
+  const { isLoggedIn } = useAuthContext()
   return (
-    <div className="layout">
+    <div>
       <Head>
         <title>Ecommerce Learning</title>
       </Head>
-      <header>
-        <Navbar />
-      </header>
-      <main className="main-container">
-        {children}
+      <main className="container">
+        <div className="flex">
+          {isLoggedIn && <Sidebar />}
+          <div>
+            {children}
+            <Footer />
+          </div>
+        </div>
       </main>
-      <footer>
-        <Footer />
-      </footer>
     </div>
   )
 }
