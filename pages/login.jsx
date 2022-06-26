@@ -1,21 +1,13 @@
 import { useRouter } from 'next/router'
 import React, { useEffect, useState } from 'react'
 import { useAuthContext } from '../context/AuthContext'
+import { withAuth, withAuthServerSideProps } from '../hocs/withAuth'
 
 const login = () => {
   const [password, setPassword] = useState('')
   const [email, setEmail] = useState('')
   const { isLoggedIn, login } = useAuthContext()
   const router = useRouter()
-  
-  useEffect(() => {
-    console.log(isLoggedIn)
-    if(isLoggedIn) {
-      router.push('/')
-    }
-  }, [])
-
-  if(isLoggedIn) return null
 
   const handleEmailChange = (e) => {
     setEmail(e.target.value)
@@ -27,7 +19,6 @@ const login = () => {
 
   const handleLogin = async () => {
     const res = await login(email, password)
-    console.log(res)
     if(res.status === 200) {
       return router.push('/')
     }
@@ -163,4 +154,7 @@ const login = () => {
   )
 }
 
-export default login
+export default withAuth(login, {
+  isLoggedOutPage: true
+})
+export const getServerSideProps = withAuthServerSideProps()

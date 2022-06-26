@@ -1,24 +1,18 @@
 import { useAuthContext } from "../context/AuthContext"
 import axios from 'axios'
 import { useRouter } from 'next/router'
-import { useEffect } from "react"
-import { Sidebar } from "../components"
+import { withAuth, withAuthServerSideProps } from "../hocs/withAuth"
+import { baseUrl } from "../constants/axiosBaseUrl"
 
-export default function Home() {
+const Home = () => {
   const router = useRouter()
   const {
     isLoggedIn,
     authToken,
   } = useAuthContext()
-  
-  useEffect(() => {
-    if(!isLoggedIn) {
-      router.push('/login')
-    }
-  }, [])
 
   const fetchChildren = () => {
-    axios.get('http://localhost:3035/api/v1/children', { 
+    axios.get(`${baseUrl}/children`, { 
 			headers: {
         'Content-Type': 'application/json',
         'Authorization': authToken
@@ -26,7 +20,7 @@ export default function Home() {
 		}).then(response => {
 			console.log(response)
 		}).catch(error => {
-			console.log(error)
+			console.error(error)
 		})
   }
 
@@ -43,3 +37,6 @@ export default function Home() {
     </div>
   )
 }
+
+export default withAuth(Home)
+export const getServerSideProps = withAuthServerSideProps()

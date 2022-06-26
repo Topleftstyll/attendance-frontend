@@ -3,6 +3,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react'
 import Cookies from 'js-cookie'
 import { createCookie } from '../helpers/cookieHelper'
 import { useRouter } from 'next/router'
+import { baseUrl } from '../constants/axiosBaseUrl'
 
 const Context = createContext()
 
@@ -13,7 +14,7 @@ export const AuthContext = ({ children }) => {
 	const router = useRouter()
 
 	const checkIfLoggedIn = async () => {
-		await axios.get('http://localhost:3035/api/v1/current-user', { 
+		await axios.get(`${baseUrl}/current-user`, { 
 			headers: {
         'Content-Type': 'application/json',
         'Authorization': authToken
@@ -21,11 +22,9 @@ export const AuthContext = ({ children }) => {
 		}).then(response => {
 			if(response.status === 200) {
 				setIsLoggedIn(true)
-				router.push('/')
 			}
 		}).catch(error => {
       console.error(error)
-			router.push('/login')
 		})
 		setCheckLoginLoading(false)
 	}
@@ -56,20 +55,18 @@ export const AuthContext = ({ children }) => {
 	}
 
 	const logout = async () => {
-		console.log('1')
 		axios.delete('http://localhost:3035/users/sign_out', { 
 			headers: {
 				'Content-Type': 'application/json',
 				'Authorization': authToken
 			},
 		}).then(response => {
-			console.log(response)
 			Cookies.remove('authToken')
 			setIsLoggedIn(false)
 			setAuthToken(null)
       router.push('/login')
 		}).catch(error => {
-			console.log(error)
+			console.error(error)
 		})
 	}
 
