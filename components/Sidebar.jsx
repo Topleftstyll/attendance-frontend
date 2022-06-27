@@ -9,7 +9,7 @@ const Sidebar = () => {
    const router = useRouter()
    return (
       <aside className="w-64" aria-label="Sidebar">
-         <div className="h-screen overflow-y-auto py-4 px-3 bg-gray-50 rounded-r">
+         <div className="fixed w-64 h-screen overflow-y-auto py-4 px-3 bg-gray-50 rounded-r">
             <ul className="space-y-2">
                <li>
                   <SidebarButton onClick={() => router.push('/')} title="Dashboard" icon={icons.dashboard} />
@@ -34,6 +34,7 @@ const Sidebar = () => {
                </li>
             </ul>
          </div>
+         <div className="w-64" />
       </aside>
    )
 }

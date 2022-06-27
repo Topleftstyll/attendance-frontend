@@ -1,32 +1,77 @@
-import React, { useEffect } from 'react'
-import { useAuthContext } from '../../context/AuthContext'
+import React, { useEffect, useState } from 'react'
 import axios from 'axios'
 import { baseUrl } from '../../constants/axiosBaseUrl'
 import { withAuth, withAuthServerSideProps } from '../../hocs/withAuth'
-import Card from '../../components/Card'
 import PageHeader from '../../components/PageHeader'
+import { Table, Input } from 'antd'
+import { useRouter } from 'next/router'
+import PrimaryButton from '../../components/PrimaryButton'
 
 const Groups = ({ fetchResults }) => {
-  const { authToken } = useAuthContext()
+  const router = useRouter()
+  const [filterText, setFilterText] = useState("")
+
+  const filteredResults = fetchResults.filter((result) => (
+    result.name.toLowerCase().includes(filterText)
+  ))
+
+  const columns = [
+    {
+      title: 'Name',
+      dataIndex: 'name',
+      key: 'name',
+      sorter: (a, b) => a.name.localeCompare(b.name),
+      sortDirections: ['descend', 'ascend'],
+    },
+    {
+      title: 'Children',
+      dataIndex: 'children_count',
+      key: 'children',
+      sorter: (a, b) => a.children_count - b.children_count,
+      sortDirections: ['descend', 'ascend'],
+    },
+    {
+      title: 'Description',
+      dataIndex: 'description',
+      key: 'description',
+      render: (description) => (
+        <p className="line-clamp-3">
+          {description}
+        </p>
+      )
+    },
+    {
+      title: 'Action',
+      key: 'action',
+      render: (_, record) => (
+        <PrimaryButton
+          onClick={() => router.push(`/groups/${record.id}`)}
+          label="View"
+          size="medium"
+        />
+      )
+    },
+  ]
+
+  const handleFilterChange = (e) => {
+    setFilterText(e.target.value.toLowerCase())
+  }
+
   return (
     <div>
       <PageHeader title={"Groups"} description={"Select a group to view students."} />
-      <div className="flex justify-start flex-wrap gap-3 max-w-94p m-auto">
-        {fetchResults?.map((group, idx) => (
-          <Card
-            key={`card-group-${idx}`}
-            title={group.name}
-            description={group.note}
-            tags={[`Children ${group.children_count}`]}
-            onClick={() => console.log(1)}
-          />
-        ))}
+      <div className="mb-4 w-80">
+        <Input
+          placeholder="Filter groups"
+          onChange={handleFilterChange}
+        />
       </div>
+      <Table dataSource={filteredResults} columns={columns} />
     </div>
   )
 }
 
-const fetchGroups = async (authToken) => {
+const fetchGroups = async (context, authToken) => {
   let res = {}
   await axios.get(`${baseUrl}/groups`, { 
     headers: {

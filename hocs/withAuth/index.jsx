@@ -12,7 +12,7 @@ export function withAuthServerSideProps(getServerSidePropsFunc) {
 
     const isLoggedIn = await checkIfUserIsAuthenticated({ authToken })
     if(isLoggedIn && getServerSidePropsFunc) {
-      const data = await getServerSidePropsFunc(authToken)
+      const data = await getServerSidePropsFunc(context, authToken)
       return {
         props: { isLoggedIn, data },
       }
@@ -52,7 +52,7 @@ export const withAuth = (
     return (
       <div className="flex">
         {!isLoggedOutPage && <Sidebar />}
-        <div className="w-full">
+        <div className="w-full page-wrapper">
           <Component fetchResults={props.data} />
           <Footer />
         </div>
