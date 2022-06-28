@@ -12,14 +12,14 @@ import { useAuthContext } from '../../context/AuthContext'
 const { Option } = Select;
 
 const ShowGroup = ({ fetchResults }) => {
-  const [initialChild, setInitialChild] = useState(fetchResults || null)
   const [child, setChild] = useState(fetchResults || null)
   const [searchFilterText, setSearchFilterText] = useState('')
   const { authToken } = useAuthContext()
 
-  const filteredGroups = initialChild?.groups.filter((group) => (
+  // usememo here
+  const filteredGroups = useMemo(() => child?.groups.filter((group) => (
     group.name.toLowerCase().includes(searchFilterText)
-  ))
+  )), [child?.groups, searchFilterText])
 
   const handleInputChange = (val, property) => {
     let full_name = child.full_name
@@ -31,7 +31,7 @@ const ShowGroup = ({ fetchResults }) => {
       full_name = `${child.first_name} ${val}`
     }
     if(property === 'group') {
-      newVal = initialChild.groups.find(group => group.id === val)
+      newVal = child.groups.find(group => group.id === val)
     }
 
     setChild(child => (
@@ -59,7 +59,6 @@ const ShowGroup = ({ fetchResults }) => {
         },
       })
       if(res.status === 200) {
-        setInitialChild(res.data)
         message.success('Successfully updated child')
       } else {
         message.error('Error updating child')
@@ -75,7 +74,7 @@ const ShowGroup = ({ fetchResults }) => {
 
   return (
     <div>
-      <PageHeader title={initialChild?.full_name} description={initialChild?.group?.name} />
+      <PageHeader title={child?.full_name} description={child?.group?.name} />
       <div className="mb-4 w-80">
         <InputLabel label="First Name" />
         <Input

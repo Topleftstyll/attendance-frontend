@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import axios from 'axios'
 import { baseUrl } from '../../constants/axiosBaseUrl'
 import { withAuth, withAuthServerSideProps } from '../../hocs/withAuth'
@@ -11,9 +11,9 @@ const Groups = ({ fetchResults }) => {
   const router = useRouter()
   const [filterText, setFilterText] = useState("")
 
-  const filteredResults = fetchResults.filter((result) => (
+  const filteredResults = useMemo(() => fetchResults.filter((result) => (
     result.name.toLowerCase().includes(filterText)
-  ))
+  )), [fetchResults, filterText])
 
   const columns = [
     {

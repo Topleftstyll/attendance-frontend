@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/router'
 import { withAuth, withAuthServerSideProps } from '../../hocs/withAuth'
 import axios from 'axios'
@@ -11,9 +11,9 @@ const ShowGroup = ({ fetchResults }) => {
   const router = useRouter()
   const [filterText, setFilterText] = useState("")
 
-  const filteredResults = fetchResults?.children?.filter((result) => (
+  const filteredResults = useMemo(() => fetchResults?.children?.filter((result) => (
     result.full_name.toLowerCase().includes(filterText)
-  ))
+  )), [fetchResults?.children, filterText])
 
   const columns = [
     {
