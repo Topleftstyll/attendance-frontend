@@ -1,17 +1,17 @@
 import React, { useEffect, useState } from 'react'
-import { useRouter } from 'next/router'
-import { withAuth, withAuthServerSideProps } from '../../hocs/withAuth'
 import axios from 'axios'
 import { baseUrl } from '../../constants/axiosBaseUrl'
+import { withAuth, withAuthServerSideProps } from '../../hocs/withAuth'
 import PageHeader from '../../components/PageHeader'
 import { Table, Input } from 'antd'
+import { useRouter } from 'next/router'
 import PrimaryButton from '../../components/PrimaryButton'
 
-const ShowGroup = ({ fetchResults }) => {
+const Groups = ({ fetchResults }) => {
   const router = useRouter()
   const [filterText, setFilterText] = useState("")
 
-  const filteredResults = fetchResults?.children?.filter((result) => (
+  const filteredResults = fetchResults.filter((result) => (
     result.full_name.toLowerCase().includes(filterText)
   ))
 
@@ -21,9 +21,19 @@ const ShowGroup = ({ fetchResults }) => {
       dataIndex: 'full_name',
       key: 'full_name',
       sorter: (a, b) => {
-        a.full_name.localeCompare(b.full_name)
+        return a.full_name.localeCompare(b.full_name)
       },
       sortDirections: ['descend', 'ascend'],
+    },
+    {
+      title: 'Group',
+      dataIndex: 'group',
+      key: 'group_name',
+      sorter: (a, b) => {
+        return a.group.name.localeCompare(b.group.name)
+      },
+      sortDirections: ['descend', 'ascend'],
+      render: (group) => group.name
     },
     // {
     //   title: 'Guadian',
@@ -62,10 +72,10 @@ const ShowGroup = ({ fetchResults }) => {
 
   return (
     <div>
-      <PageHeader title={fetchResults?.group?.name} description={fetchResults?.group?.description} />
+      <PageHeader title={"Children"} description={"View, Edit and Delete children."} />
       <div className="mb-4 w-80">
         <Input
-          placeholder="Filter groups"
+          placeholder="Filter children"
           onChange={handleFilterChange}
         />
       </div>
@@ -74,9 +84,9 @@ const ShowGroup = ({ fetchResults }) => {
   )
 }
 
-const fetchGroup = async (context, authToken) => {
+const fetchChildren = async (context, authToken) => {
   let res = {}
-  await axios.get(`${baseUrl}/groups/${context.params.pid}`, { 
+  await axios.get(`${baseUrl}/children`, { 
     headers: {
       'Content-Type': 'application/json',
       'Authorization': authToken
@@ -89,5 +99,5 @@ const fetchGroup = async (context, authToken) => {
   return res
 }
 
-export default withAuth(ShowGroup)
-export const getServerSideProps = withAuthServerSideProps(fetchGroup)
+export default withAuth(Groups)
+export const getServerSideProps = withAuthServerSideProps(fetchChildren)

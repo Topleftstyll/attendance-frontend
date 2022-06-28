@@ -18,7 +18,7 @@ const Sidebar = () => {
                   <SidebarButton onClick={() => router.push('/groups')} title="Groups" icon={icons.group} />
                </li>
                <li>
-                  <SidebarButton onClick={() => null} title="Inbox" icon={icons.inbox} />
+                  <SidebarButton onClick={() => router.push('/children')} title="Children" icon={icons.users} />
                </li>
                <li>
                   <SidebarButton onClick={() => null} title="Users" icon={icons.users} />
