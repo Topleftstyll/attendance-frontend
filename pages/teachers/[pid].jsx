@@ -12,30 +12,30 @@ import { useAuthContext } from '../../context/AuthContext'
 const { Option } = Select;
 
 const ShowGroup = ({ fetchResults }) => {
-  const [child, setChild] = useState(fetchResults || null)
+  const [teacher, setTeacher] = useState(fetchResults || null)
   const [searchFilterText, setSearchFilterText] = useState('')
   const { authToken } = useAuthContext()
 
-  const filteredGroups = useMemo(() => child?.groups.filter((group) => (
+  const filteredGroups = useMemo(() => teacher?.groups.filter((group) => (
     group.name.toLowerCase().includes(searchFilterText)
-  )), [child?.groups, searchFilterText])
+  )), [teacher?.groups, searchFilterText])
 
   const handleInputChange = (val, property) => {
-    let full_name = child.full_name
+    let full_name = teacher.full_name
     let newVal = val
     if(property === 'first_name') {
-      full_name = `${val} ${child.last_name}`
+      full_name = `${val} ${teacher.last_name}`
     }
     if(property === 'last_name') {
-      full_name = `${child.first_name} ${val}`
+      full_name = `${teacher.first_name} ${val}`
     }
     if(property === 'group') {
-      newVal = child.groups.find(group => group.id === val)
+      newVal = teacher.groups.find(group => group.id === val)
     }
 
-    setChild(child => (
+    setTeacher(teacher => (
       {
-        ...child,
+        ...teacher,
         [property]: newVal,
         full_name
       }
@@ -44,11 +44,11 @@ const ShowGroup = ({ fetchResults }) => {
 
   const handleSubmit = async () => {
     try {
-      const res = await axios.patch(`${baseUrl}/children/${child.id}`, {
-        api_v1_child: {
-          first_name: child.first_name,
-          last_name: child.last_name,
-          group_id: child.group.id,
+      const res = await axios.patch(`${baseUrl}/teachers/${teacher.id}`, {
+        api_v1_teacher: {
+          first_name: teacher.first_name,
+          last_name: teacher.last_name,
+          group_id: teacher.group.id,
         }
       },
       { 
@@ -58,12 +58,12 @@ const ShowGroup = ({ fetchResults }) => {
         },
       })
       if(res.status === 200) {
-        message.success('Successfully updated child')
+        message.success('Successfully updated teacher')
       } else {
-        message.error('Error updating child')
+        message.error('Error updating teacher')
       }
     } catch (err) {
-      message.error('Error updating child')
+      message.error('Error updating teacher')
     }
   }
 
@@ -73,23 +73,23 @@ const ShowGroup = ({ fetchResults }) => {
 
   return (
     <div>
-      <PageHeader title={child?.full_name} description={child?.group?.name} />
+      <PageHeader title={teacher?.full_name} description={teacher?.group?.name} />
       <div className="mb-4 w-80">
         <InputLabel label="First Name" />
         <Input
           placeholder="First Name"
           onChange={(e) => handleInputChange(e.target.value, 'first_name')}
-          value={child.first_name}
+          value={teacher.first_name}
         />
         <InputLabel label="Last Name" marginTop='mt-3' />
         <Input
           placeholder="Last Name"
           onChange={(e) => handleInputChange(e.target.value, 'last_name')}
-          value={child.last_name}
+          value={teacher.last_name}
         />
         <InputLabel label="Select Group" marginTop='mt-3' />
         <Select
-          defaultValue={child.group.name}
+          defaultValue={teacher.group.name}
           style={{ width: '100%' }}
           onChange={(val) => handleInputChange(val, 'group')}
           showSearch
@@ -97,7 +97,7 @@ const ShowGroup = ({ fetchResults }) => {
           filterOption={false}
         >
           {filteredGroups.map((group, idx) => (
-            <Option key={`child-group-dropdown-${idx}`} value={group.id}>
+            <Option key={`teacher-group-dropdown-${idx}`} value={group.id}>
               {group.name}
             </Option>
           ))}
@@ -115,9 +115,9 @@ const ShowGroup = ({ fetchResults }) => {
   )
 }
 
-const fetchChild = async (context, authToken) => {
+const fetchteacher = async (context, authToken) => {
   let res = {}
-  await axios.get(`${baseUrl}/children/${context.params.pid}`, { 
+  await axios.get(`${baseUrl}/teachers/${context.params.pid}`, { 
     headers: {
       'Content-Type': 'application/json',
       'Authorization': authToken
@@ -131,4 +131,4 @@ const fetchChild = async (context, authToken) => {
 }
 
 export default withAuth(ShowGroup)
-export const getServerSideProps = withAuthServerSideProps(fetchChild)
+export const getServerSideProps = withAuthServerSideProps(fetchteacher)

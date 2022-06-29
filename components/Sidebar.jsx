@@ -21,10 +21,10 @@ const Sidebar = () => {
                   <SidebarButton onClick={() => router.push('/children')} title="Children" icon={icons.users} />
                </li>
                <li>
-                  <SidebarButton onClick={() => null} title="Users" icon={icons.users} />
+                  <SidebarButton onClick={() => router.push('/teachers')} title="Teachers" icon={icons.users} />
                </li>
                <li>
-                  <SidebarButton onClick={() => null} title="Products" icon={icons.products} />
+                  <SidebarButton onClick={() => router.push('/guardians')} title="Guardians" icon={icons.products} />
                </li>
                <li>
                   <SidebarButton onClick={() => null} title="Sign In" icon={icons.login} />
