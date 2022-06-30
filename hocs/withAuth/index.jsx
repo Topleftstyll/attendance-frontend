@@ -52,8 +52,10 @@ export const withAuth = (
     return (
       <div className="flex">
         {!isLoggedOutPage && <Sidebar />}
-        <div className="w-full page-wrapper">
-          <Component fetchResults={props.data} />
+        <div className="w-full">
+          <div className="main-page-wrapper">
+            <Component fetchResults={props.data} />
+          </div>
           <Footer />
         </div>
       </div>
