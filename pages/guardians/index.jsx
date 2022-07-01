@@ -9,56 +9,36 @@ import PrimaryButton from '../../components/PrimaryButton'
 
 const Groups = ({ fetchResults }) => {
   const router = useRouter()
+  const [guardians, setGuardians] = useState(fetchResults)
   const [filterText, setFilterText] = useState("")
 
-  const filteredResults = useMemo(() => fetchResults.filter((result) => (
-    result.full_name.toLowerCase().includes(filterText)
-  )), [fetchResults, filterText])
+  const filteredResults = useMemo(() => guardians.filter((result) => (
+    result.full_name.toLowerCase().includes(filterText) ||
+    result.children?.[0]?.full_name.toLowerCase().includes(filterText)
+  )), [filterText])
 
   const columns = [
     {
       title: 'Full Name',
       dataIndex: 'full_name',
       key: 'full_name',
-      sorter: (a, b) => {
-        return a.full_name.localeCompare(b.full_name)
-      },
+      sorter: (a, b) => a.full_name.localeCompare(b.full_name),
       sortDirections: ['descend', 'ascend'],
     },
     {
-      title: 'Group',
-      dataIndex: 'group',
-      key: 'group_name',
-      sorter: (a, b) => {
-        return a.group.name.localeCompare(b.group.name)
-      },
+      title: 'Child',
+      dataIndex: 'children',
+      key: 'children',
+      sorter: (a, b) => a.children?.[0].full_name.localeCompare(b.children?.[0].full_name),
       sortDirections: ['descend', 'ascend'],
-      render: (group) => group.name
+      render: (record) => record?.[0]?.full_name || 'No Child' 
     },
-    // {
-    //   title: 'Guadian',
-    //   dataIndex: 'guardian_full_name',
-    //   key: 'guardian_full_name',
-    //   sorter: (a, b) => {
-    //     a.guadian.full_name.localeCompare(b.guadian.full_name)
-    //   },
-    //   sortDirections: ['descend', 'ascend'],
-    // },
-    // {
-    //   title: 'Teacher',
-    //   dataIndex: 'teacher_full_name',
-    //   key: 'teacher_full_name',
-    //   sorter: (a, b) => {
-    //     a.guadian.full_name.localeCompare(b.guadian.full_name)
-    //   },
-    //   sortDirections: ['descend', 'ascend'],
-    // },
     {
       title: 'Action',
       key: 'action',
       render: (_, record) => (
         <PrimaryButton
-          onClick={() => router.push(`/children/${record.id}`)}
+          onClick={() => router.push(`/guardians/${record.id}`)}
           label="View"
           size="medium"
         />
@@ -72,21 +52,24 @@ const Groups = ({ fetchResults }) => {
 
   return (
     <div>
-      <PageHeader title={"Children"} description={"View, Edit and Delete children."} />
+      <PageHeader title={"Guardians"} description={"View, Edit and Delete guardians."} />
       <div className="mb-4 w-80">
         <Input
-          placeholder="Filter children"
+          placeholder="Filter guardians or children"
           onChange={handleFilterChange}
         />
       </div>
-      <Table dataSource={filteredResults} columns={columns} />
+      <Table
+        dataSource={filteredResults}
+        columns={columns}
+      />
     </div>
   )
 }
 
-const fetchChildren = async (context, authToken) => {
+const fetchGuardians = async (context, authToken) => {
   let res = {}
-  await axios.get(`${baseUrl}/children`, { 
+  await axios.get(`${baseUrl}/guardians`, { 
     headers: {
       'Content-Type': 'application/json',
       'Authorization': authToken
@@ -100,4 +83,4 @@ const fetchChildren = async (context, authToken) => {
 }
 
 export default withAuth(Groups)
-export const getServerSideProps = withAuthServerSideProps(fetchChildren)
+export const getServerSideProps = withAuthServerSideProps(fetchGuardians)

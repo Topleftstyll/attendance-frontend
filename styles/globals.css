@@ -23,3 +23,7 @@ a {
   padding: 40px;
   min-height: calc(100vh - 135px);
 }
+
+.ant-table-row-expand-icon {
+  display: none !important;
+}
