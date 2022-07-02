@@ -15,8 +15,6 @@ const ShowGroup = ({ fetchResults }) => {
   const [guardian, setGuardian] = useState(fetchResults || null)
   const { authToken } = useAuthContext()
 
-  console.log(fetchResults)
-
   const handleInputChange = (val, property) => {
     let full_name = guardian.full_name
     let newVal = val
