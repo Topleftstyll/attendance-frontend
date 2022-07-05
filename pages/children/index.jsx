@@ -3,7 +3,7 @@ import axios from 'axios'
 import { baseUrl } from '../../constants/axiosBaseUrl'
 import { withAuth, withAuthServerSideProps } from '../../hocs/withAuth'
 import PageHeader from '../../components/PageHeader'
-import { Table, Input, message, Tooltip } from 'antd'
+import { Table, Input, message, Tooltip, Popconfirm } from 'antd'
 import { useRouter } from 'next/router'
 import PrimaryButton from '../../components/PrimaryButton'
 import { IoMdAdd } from 'react-icons/io'
@@ -19,18 +19,34 @@ const renderTooltipTitle = (guardians) => {
 
 const Groups = ({ fetchResults }) => {
   const router = useRouter()
+  const [children, setChildren] = useState(fetchResults)
   const [filterText, setFilterText] = useState("")
   const [showGuardianModal, setShowGuardianModal] = useState(false)
   const [selectedChild, setSelectedChild] = useState(null)
   const { authToken } = useAuthContext()
 
-  const filteredResults = useMemo(() => fetchResults.filter((result) => (
+  const filteredResults = useMemo(() => children.filter((result) => (
     result.full_name.toLowerCase().includes(filterText)
-  )), [fetchResults, filterText])
+  )), [children, filterText])
 
   const handleShowGuardianModal = (child) => {
     setSelectedChild(child)
     setShowGuardianModal(true)
+  }
+
+  const handleDeleteChild = async (child) => {
+    await axios.delete(`${baseUrl}/children/${child.id}`, { 
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': authToken
+      }
+    }).then(async (response) => {
+      setChildren(children => children.filter(c => c.id !== child.id))
+      message.success(`successfully deleted ${child.full_name}.`)
+    }).catch(error => {
+      console.error(error)
+      message.error(`Could not delete child ${child.full_name}.`)
+    })
   }
 
   const handleAddGuardian = async () => {
@@ -42,7 +58,7 @@ const Groups = ({ fetchResults }) => {
         email: selectedChild.guardian.email,
         phone_number: selectedChild.guardian.email
       }
-    },{ 
+    }, { 
       headers: {
         'Content-Type': 'application/json',
         'Authorization': authToken
@@ -96,8 +112,7 @@ const Groups = ({ fetchResults }) => {
           onClick={() => handleShowGuardianModal(record)}
           icon={<IoMdAdd color="white" />}
         />
-      )
-      )
+      ))
     },
     // {
     //   title: 'Teacher',
@@ -112,11 +127,20 @@ const Groups = ({ fetchResults }) => {
       title: 'Action',
       key: 'action',
       render: (_, record) => (
-        <PrimaryButton
-          onClick={() => router.push(`/children/${record.id}`)}
-          label="View"
-          size="medium"
-        />
+        <div className="flex gap-1">
+          <PrimaryButton
+            onClick={() => router.push(`/children/${record.id}`)}
+            label="View"
+            size="medium"
+          />
+          <Popconfirm title="Are you sure？" okText="Yes" cancelText="No" onConfirm={() => handleDeleteChild(record)}>
+            <PrimaryButton
+              label="Delete"
+              size="medium"
+              type="danger"
+            />
+          </Popconfirm>
+        </div>
       )
     },
   ]
@@ -142,7 +166,6 @@ const Groups = ({ fetchResults }) => {
         onCancel={() => setShowGuardianModal(false)}
         isOpen={showGuardianModal}
         title={`Add Guardian for ${selectedChild?.full_name}`}
-
       >
         <GuardianForm selectedChild={selectedChild} setSelectedChild={setSelectedChild} />
       </Modal>

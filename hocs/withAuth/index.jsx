@@ -13,6 +13,9 @@ export function withAuthServerSideProps(getServerSidePropsFunc) {
     const isLoggedIn = await checkIfUserIsAuthenticated({ authToken })
     if(isLoggedIn && getServerSidePropsFunc) {
       const data = await getServerSidePropsFunc(context, authToken)
+      if(data.redirect) {
+        return data
+      }
       return {
         props: { isLoggedIn, data },
       }

@@ -1,10 +1,16 @@
 import React from 'react'
 import { Button } from 'antd';
 
-const PrimaryButton = ({ label = null, onClick, size, icon = null }) => {
+const PrimaryButton = ({
+  type = 'primary',
+  label = null,
+  onClick,
+  size,
+  icon = null
+}) => {
   return (
     <Button
-      type="primary"
+      type={type}
       size={size}
       onClick={onClick}
     >
