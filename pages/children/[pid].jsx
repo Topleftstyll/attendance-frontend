@@ -77,6 +77,7 @@ const ShowGroup = ({ fetchResults }) => {
     if(property === 'guardian') {
       const newGuardian = child.all_guardians.find(guardian => guardian.id === val)
       newVal = [...child.current_guardians, newGuardian]
+      setSearchGuardianFilterText('')
     }
 
     setChild(child => (
